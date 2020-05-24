@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Maze Runner</title>
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="This is a PWA Starter app">
+    <meta name="theme-color" content="#686bd2">
+
+    <!-- These meta tags are Apple-specific, and set the web application to run in full-screen mode with a black status bar. Learn more at https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Maze Runner">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Imports an icon to represent the document. -->
+    <link rel="icon" href="./assets/icons/icon_24.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="./asses/icons/icon.png"/>
+
+
+    <!-- Imports the manifest to represent the web application. A web app must have a manifest to be a PWA. -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- A stylesheet to design the pages. -->
+    <link href="https://fluentdesignforweb.github.io/normalize.css" type="text/css" rel="stylesheet">
+    <link href="https://fluentdesignforweb.github.io/fluent.css" type="text/css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="extra.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+    </head>
+    <body onload="checkinstall();">
+        <div id="body">
+            <div class="loading">
+            
+            </div>
+            <canvas></canvas>
+        </div>
+    
+        <div class="modal_container" id="install_button_surface">
+            <div class="modal_content zi2">
+                <div class="page_container">
+                    <div class="columns large12 medium12 small12">
+                        <br><br>
+                        <img src="./assets/icons/icon.png" class="circular icon_large">
+                        <p class="app_name right"><b>Maze Runner</b></p>
+                        <hr><br><br>
+                    </div>
+                    <div class="columns large12 medium12 small12">
+                        <p class="app_name">Maze Runner</p>
+                        <p class="app_desc">
+                            Maze Runner is an simple maze running/solving game for passing time.
+                        </p>
+                        <button class="left large primary_blue" onclick="install(); closeinstaller();">Install</button>
+                        <button class="left primary_red can" onclick="closeinstaller();">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script type="text/javascript" src="main.js"></script>
+
+<script>
+    // This is the "Offline copy of pages" service worker
+
+    // Add this below content to your HTML page, or add the js file to your page at the very top to register service worker
+
+    // Check compatibility for the browser we're running this in
+    if ("serviceWorker" in navigator) {
+        if (navigator.serviceWorker.controller) {
+            console.log("Active service worker found, no need to register");
+        } else {
+            // Register the service worker
+            navigator.serviceWorker
+            .register("pwabuilder-sw.js", {
+                scope: "./"
+            })
+            .then(function (reg) {
+                console.log("Service worker has been registered for scope: " + reg.scope);
+            });
+        }
+    }
+</script>
+
+<script>
+    let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        });
+
+        async function install() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            console.log(deferredPrompt)
+            deferredPrompt.userChoice.then(function(choiceResult){
+
+            if (choiceResult.outcome === 'accepted') {
+            console.log('Your PWA has been installed');
+            } else {
+            console.log('User chose to not install your PWA');
+            }
+
+            deferredPrompt = null;
+
+            });
+
+        }
+        closeinstaller();
+        }
+
+        function showinstaller(){
+            document.getElementById("install_button_surface").style.display="Block";
+            document.getElementById("body").style.filter="saturate(250%) blur(25px)";
+        }
+        
+        function closeinstaller(){
+            document.getElementById("install_button_surface").style.display="none";
+            document.getElementById("body").style.filter="saturate(100%) blur(0px)";
+        }
+</script>
+
+<script>
+        function checkinstall(){
+            if (window.matchMedia('(display-mode: standalone)').matches) {  
+                closeinstaller();
+                console.log('display-mode is standalone');
+            }  
+            else
+                showinstaller();
+        }
+</script>
